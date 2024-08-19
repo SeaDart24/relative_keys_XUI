@@ -1,0 +1,77 @@
+{% extends 'layout.html' %}
+
+{% block title %}Results{% endblock %}
+
+{% block content %}
+
+<h1>In-Database Model Explanation    <a href="/" class="back-button">Query Page</a></h1>
+
+{% if success %}
+    <div>
+        <h1 style="color: #4CAF50;">Upload Successful!</h1>
+        <p>Your dataset with models have been uploaded successfully.</p>
+    </div>
+{% endif %}
+
+
+{% if not results %}
+
+    <p>Currently Available Datasets</p>
+
+    <div class="dataset-selection" id="datasetSelection">
+        {% for dataset in datasets %}
+            <div class="data-card" data-dataset-id="{{ dataset.name }}">
+                <h3>{{ dataset.name }}</h3>
+                <p>Num of Models    {{dataset.num_m}}</p>
+            </div>
+        {% endfor %}
+    </div>
+
+    <br>
+    <br>
+
+    <p class = "data-card"> + Add a New Dataset </p>
+
+    <form action="/process" method="post" enctype="multipart/form-data">
+        <div class="input_container">
+            <input type="file" name="file" id="fileUpload">
+        </div>
+        <button type="submit">Upload and Process</button>
+    </form>
+
+{% endif %}
+
+{% if results %}
+    <h2>Processed Data</h2>
+    <form action="/upload" method="post" enctype="multipart/form-data">
+        <div class="input_container">
+            <label for="name">Give the dataset a Name (without spaces please):</label>
+            <input type="text" name="name" id="name" required>
+        </div>
+        <div class="input_container">
+            <label for="numModels">Number of Models: </label>
+            <input type="number" name="num_models" id="numModels" value="5" min="1">
+        </div>
+        <div class="input_container">
+            <label>Multi-Class? (More than 2 output classes):</label>
+            <label for="noOption">
+                <input type="radio" name="multi" id="noOption" value="no" checked> No
+            </label>
+            <label for="yesOption">
+                <input type="radio" name="multi" id="yesOption" value="yes"> Yes
+            </label>
+            
+        </div>
+        <button type="submit">Generate and Upload Models</button>
+    </form>
+
+    <div class="table-responsive">
+        {{ results|safe }}
+    </div>
+{% endif %}
+
+{% endblock %}
+
+{% block head %}
+<link href="{{ url_for('static', filename='css/main.css') }}" rel="stylesheet">
+{% endblock %}

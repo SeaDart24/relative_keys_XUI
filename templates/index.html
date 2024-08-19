@@ -1,0 +1,273 @@
+{% extends 'layout.html' %}
+
+{% block title %}Query Model{% endblock %}
+
+{% block content %}
+
+<a href="/data" class="back-button">Add | View Datasets</a>
+<h1>In-Database Model Explanation</h1>
+
+{% if not pred %}
+    <p>Choose a Dataset and select / add compatible model to get predictions</p>
+
+    <br>
+    <div class="dataset-selection" id="datasetSelection">
+        {% for dataset in datasets %}
+            <div class="dataset-card" data-dataset-id="{{ dataset.name }}">
+                <h3>{{ dataset.name }}</h3>
+                <p>Models Trained    {{ dataset.num_m}}</p>
+            </div>
+        {% endfor %}
+    </div>
+
+    <h3>Models</h3>
+    <p>Select Model or upload compatible model's pickle file</p>
+    <div class="dataset-selection" id="models-list"></div>
+    
+    <div class="input_container">
+        <input type="file" name="file" id="fileUpload" accept=".pkl">
+    </div>
+
+    <div class="epsilon-selection">
+        <button class="submit-button" id="predictButton">Predict</button>
+    </div>
+
+{% endif %}
+
+
+
+
+    <p>Check Predictions, Choose a Method & Tune paramters to query</p>
+
+    <div class="prediction-container">
+        {{ pred|safe }}
+    </div>
+
+    <div class="epsilon-container">
+    <div class="epsilon-selection">
+        <p><b>Select Explanation method</b></p>
+        <label>
+            <input type="radio" name="method" value="SRK"> SRK
+        </label>
+        <label>
+            <input type="radio" name="method" value="OSRK"> OSRK
+        </label>
+    </div>
+
+    <div class="epsilon-selection">
+        <p><b>Select Epsilon Value</b></p>
+        <label>
+            <input type="radio" name="epsilon" value="0"> 1-alpha
+        </label>
+        <label>
+            <input type="radio" name="epsilon" value="0.02"> 0.98-alpha
+        </label>
+    </div>
+    </div>
+
+    <br>
+
+    <div class="rangeslider">
+        <input type="range" min="10" max="500" value="10" class="myslider" id="Number_of_Samples" step="10">
+        <p><b>Samples - </b> <span id="demo1"></span></p>
+    </div>
+
+    <div class="epsilon-selection">
+    <button class="submit-button" id="submitButton">Query</button>
+    </div>
+
+
+<script>
+
+    document.addEventListener('DOMContentLoaded', function() {
+
+        let selectedDatasetId = {{dataset | tojson | safe}}; // Variable to store the selected dataset ID
+        let selectedModelId = {{model| tojson | safe}};
+        let selectedEpsilon = null;
+        let selectedMethod = null;
+        let ns = 10;
+        const models = {{ models|tojson }};
+        const fileInput = document.getElementById('fileUpload');
+
+        // Function to update the value display and the variable for each slider
+        function updateSlider(sliderId, outputId, variableName) {
+        let slider = document.getElementById(sliderId);
+        let output = document.getElementById(outputId);
+        output.innerHTML = slider.value;
+
+        slider.oninput = function () {
+            output.innerHTML = this.value;
+            switch (variableName) {
+                case 'ns':
+                    ns = this.value;
+                    break;
+                default:
+                    break;
+            }
+            // Additional processing can be done here with the updated value
+            console.log(`${variableName} updated to ${this.value}`);
+        }
+        }
+
+        // Initialize all sliders
+        updateSlider("Number_of_Samples", "demo1", "ns");
+
+        // Function to handle dataset card click
+        function selectDatasetCard(event) {
+            // Remove 'selected' class from all cards
+            document.querySelectorAll('.dataset-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+
+            // Add 'selected' class to the clicked card
+            event.currentTarget.classList.add('selected');
+
+            // Get the selected dataset ID
+            selectedDatasetId = event.currentTarget.dataset.datasetId;
+            console.log('Selected Dataset ID:', selectedDatasetId);
+            displayModels(selectedDatasetId);
+
+            // Perform additional processing with the selected dataset ID
+        }
+
+        function selectModelCard(event) {
+            // Remove 'selected' class from all model cards
+            document.querySelectorAll('.model-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            // Add 'selected' class to the clicked model card
+            event.currentTarget.classList.add('selected');
+            selectedModelId = event.currentTarget.dataset.modelId;
+            console.log('Selected Model ID:', selectedModelId);
+        }
+
+        function displayModels(datasetId) {
+                const modelsList = document.getElementById('models-list');
+                modelsList.innerHTML = '';
+                console.log(models);
+                if (models[datasetId]) {
+                    models[datasetId].forEach(model => {
+                        const modelCard = document.createElement('div');
+                        modelCard.classList.add('model-card');
+                        modelCard.setAttribute('data-model-id', model);
+                        
+                        const modelTitle = document.createElement('h3');
+                        modelTitle.textContent = model;
+                        
+                        modelCard.appendChild(modelTitle);
+                        modelsList.appendChild(modelCard);
+
+                        // Add click event listener to each model card
+                        modelCard.addEventListener('click', selectModelCard);
+                    });
+                }
+            }
+
+        // Function to handle epsilon radio button selection
+        function selectEpsilon(event) {
+            selectedEpsilon = event.target.value;
+            console.log('Selected Epsilon:', selectedEpsilon);
+
+            // Perform additional processing with the selected epsilon value
+        }
+
+          // Function to handle method radio button selection
+        function selectMethod(event) {
+            selectedMethod = event.target.value;
+            console.log('Selected Method:', selectedMethod);
+
+            // Perform additional processing with the selected epsilon value
+        }
+
+        // Function to handle submit button click
+        function handleSubmit() {
+            if (selectedEpsilon && selectedMethod) {
+                // Create a data object with the selected values
+                const data = {
+                    method : selectedMethod,
+                    epsilon: selectedEpsilon,
+                    num_samples : ns
+                };
+
+                const params = new URLSearchParams(data).toString();
+                window.location.href = `/results?${params}`;
+                
+            } else {
+                alert('Please select dataset, method and an epsilon value.');
+            }
+        }
+
+        // Function to handle submit button click
+        function handlePredict() {
+            if (selectedDatasetId && (selectedModelId || document.getElementById('fileUpload').files[0])) {
+                // Create a data object with the selected values
+                
+                if (selectedModelId != null){
+                const data = {
+                    dataset : selectedDatasetId,
+                    model : selectedModelId,
+                };
+
+                const params = new URLSearchParams(data).toString();
+                window.location.href = `/predict?${params}`;
+                }
+
+                else{
+
+                    const formData = new FormData();
+                    // Append other form fields
+                    formData.append('file', document.getElementById('fileUpload').files[0]);
+                    response = fetch('http://127.0.0.1:5000/modelFile', {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    const data = {
+                        dataset : selectedDatasetId,
+                        model : null,
+                    };
+
+                    setTimeout(() => {
+
+                    const params = new URLSearchParams(data).toString();
+                    window.location.href = `/predict?${params}`;
+
+                    },2000);
+
+                }
+
+
+                
+            } else {
+                alert('Please select dataset and model');
+            }
+        }
+
+    
+
+        // Add click event listeners to all dataset cards
+        document.querySelectorAll('.dataset-card').forEach(card => {
+            card.addEventListener('click', selectDatasetCard);
+        });
+
+        document.querySelectorAll('input[name="epsilon"]').forEach(radio => {
+            radio.addEventListener('change', selectEpsilon);
+        });
+
+        document.querySelectorAll('input[name="method"]').forEach(radio => {
+            radio.addEventListener('change', selectMethod);
+        });
+
+        // Add click event listener to the submit button
+        document.getElementById('submitButton').addEventListener('click', handleSubmit);
+        // Add click event listener to the predict button
+        document.getElementById('predictButton').addEventListener('click', handlePredict);
+    });
+
+</script>
+{% endblock %}
+
+{% block head %}
+<link href="{{ url_for('static', filename='css/main.css') }}" rel="stylesheet">
+{% endblock %}
+

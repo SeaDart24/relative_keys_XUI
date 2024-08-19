@@ -1,0 +1,62 @@
+{% extends 'layout.html' %}
+
+{% block title %}Results{% endblock %}
+
+{% block content %}
+
+
+<!-- Back to Index Page Button -->
+<a href="/" class="back-button">< Back to Index Page</a>
+
+    <h1>Results - {{ results['method'] }} </h1>
+    
+    <p><b>Minimum size:</b> {{ results['min_size'] }}  &nbsp; <b>Maximum size:</b> {{ results['max_size'] }}  &nbsp;  <b>Mean size:</b> {{ results['mean_size'] }}</p>
+
+    <p><b>Minimum time:</b> {{ results['min_time'] }}  &nbsp;  <b>Maximum time:</b> {{ results['max_time'] }}  &nbsp;  <b>Maximum time:</b> {{ results['max_time'] }}</p>
+
+    <p><b>Mean precision:</b> {{ results['mean_precision'] }}  &nbsp;  <b>Mean conformity:</b> {{ results['mean_conformity'] }}</p>
+
+    <p><b>Relative keys:</b> {{ results['results'] }} rows returned..</p>
+    
+    <iframe id="dataFrame"></iframe>
+
+    <br>
+
+    <h2> Results Elaborated </h2>
+
+    <div class="prediction-container">
+            {{ table|safe }}
+    </div>
+
+<script>
+
+    // Access results['relative_keys'] from Flask template
+    const relativeKeys = {{ results['relative_keys'] | tojson }};
+    
+    const iframe = document.getElementById('dataFrame');
+    const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+
+    iframeDoc.open();
+    iframeDoc.write('<style>body { font-family: Arial, sans-serif; color: #34495E; font-size: 20px;} ul { list-style-type: none; padding: 0; } li { margin: 5px 0; }</style>');
+    iframeDoc.write('<ul></ul>');
+    iframeDoc.close();
+
+    const ul = iframeDoc.querySelector('ul');
+    
+    // Append li elements for each key-value pair in relativeKeys
+    Object.entries(relativeKeys).forEach(([key, values]) => {
+            const li = iframeDoc.createElement('li');
+            li.textContent = `${key}: ${values.join(' | ')}`;
+            ul.appendChild(li);
+        });
+
+        // Append the ul element to iframeDoc body
+        iframeDoc.body.appendChild(ul);
+
+</script>
+
+{% endblock %}
+
+{% block head %}
+<link href="{{ url_for('static', filename='css/main.css') }}" rel="stylesheet">
+{% endblock %}
