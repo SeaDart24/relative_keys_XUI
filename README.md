@@ -14,6 +14,26 @@ xgboost 1.7.1
 redis 4.6.0
 flask 2.8.1
 ```
+### Configuring Redis Connection
+To configure the Redis connection for your application, you need to update the connection parameters in the app.py file. Follow these steps:
+
+1. Open the `app.py` File
+
+Find the Redis Connection Code: Look for the section of the code where the Redis connection is established. It should look something like this:
+
+```
+r = redis.Redis(
+    host='hostname',
+    port=13060,
+    password='password'
+)
+```
+2. Update the Connection Parameters: Replace the host, port, and password values with your Redis server's details.
+
+3. Ensure that you provide the correct values for your Redis instance to establish a successful connection.
+
+4. Save Your Changes: After updating the connection details, save the `app.py` file.
+
 
 ### To start the Flask application
 
