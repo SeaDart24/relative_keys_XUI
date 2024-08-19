@@ -15,7 +15,7 @@ redis 4.6.0
 flask 2.8.1
 ```
 
-### 1 To start the Flask application
+### To start the Flask application
 
 1. Run the Flask app by executing the following command in your terminal:
 
