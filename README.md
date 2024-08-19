@@ -68,7 +68,7 @@ python app.py
 
 Sample datasets used in the project are provided in the `/data` folder.
 
-A sample model for the partial_loan dataset is available in the `/models` folder for testing purposes.
+A sample model for the partial_loan dataset is available in the `/model` folder for testing purposes.
 
 ### Additional Information
 Ensure that all necessary Python packages and dependencies are installed.
