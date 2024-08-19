@@ -15,8 +15,6 @@ redis 4.6.0
 flask 2.8.1
 ```
 
-We should configure a config file. The default file `config.yaml`is the revidivism dataset as an example. More datasets can refer to `data_process` folder.
-
 ### 1 To start the Flask application
 
 1. Run the Flask app by executing the following command in your terminal:
