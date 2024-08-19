@@ -2,7 +2,7 @@
 
 This is an extension to the work by Shuai An on the Relative keys algorithm. https://github.com/shuaianuoe/relative_keys/tree/main 
 
-This work modifies and further adds to his work by making it suitable to an online and dynamic setting that is user interactable and simple. 
+This work modifies and further adds to his work by making it suitable to an online and dynamic setting that is user interactable and simple. This README provides instructions for running the Flask app, uploading datasets, and querying explanations. The application allows you to interact with machine learning models, upload datasets, and retrieve explanations for predictions.
 
 
 Firstly, the following packages are necessary:
@@ -13,80 +13,46 @@ scikit-learn 0.24.2
 xgboost 1.7.1
 redis 4.6.0
 flask 2.8.1
-
 ```
 
 We should configure a config file. The default file `config.yaml`is the revidivism dataset as an example. More datasets can refer to `data_process` folder.
 
-### 1 Train xgboost and get other necessary information.
+### 1 To start the Flask application
+
+1. Run the Flask app by executing the following command in your terminal:
 
 ```
-python preprocess.py
+python app.py
 ```
 
-With the trained model and the inference set, we can test the algorithm. Make sure the corresponding folder exists.
+2. Open your web browser and navigate to `http://localhost:5000` to view the application.
 
-### 2.1 test srk
-
-To test SRK, run below script:
-
-```
-python main_srk.py
-```
-
-The average results will be printed on the command console, and the specific explanations for each instance will be stored in the `results` folder.
-
-### 2.2 test osrk
-
-To test OSRK, run below script:
-
-```
-python main_osrk.py
-```
-
-The average results will be printed on the command console, and the specific explanations for each instance will be stored in the `results` folder.
-
-### 2.3 test ssrk
-
-To test SSRK, run below script:
-
-```
-python main_ssrk.py
-```
-
-The average results will be printed on the command console, and the specific explanations for each instance will be stored in the `results` folder.
+3. Follow the on-screen instructions to interact with the app.
 
 
-### 2.4 test dynamic performance
+### To upload datasets
 
-To evaluate the capability in explaining dynamic models that change over time during model inference, run below script:
+1. Go to `http://localhost:5000/data/`
 
-```
-python main_dynamic_nosignal.py
-```
+2. Follow the on-screen instructions to upload your datasets.
 
-The average results will be printed on the command console.
 
-### 2.5 test the effectiveness of monitoring ML performance
+### Query and Get Explanations
 
-As an application of relative key monitoring, OSRK can be used to monitor the performance (accuracy) of blackbox ML during model serving. 
+1. `Navigate to http://localhost:5000/`
 
-We must set noise_flag=True in the `config.yaml`.
+2. Select the uploaded dataset and the corresponding model from the available options.
 
-```
-python main_indicator.py
-```
+3. If needed, upload a compatible model for the dataset in `.pkl` format.
 
-### 3 test entity matching
 
-To generate and evaluate the keys for entity matching task, run
+### Sample Data and Models
 
-```
-python test_er.py
-```
+Sample datasets used in the project are provided in the `/data` folder.
 
-We use the `certa` package to train the Ditto model. Make sure first install the `certa` package. 
+A sample model for the partial_loan dataset is available in the `/models` folder for testing purposes.
 
-### 4 redis interface
-We have also developed a very simple interface `redis_inter.py` to redis to receive data from redis. 
-Make sure the redis server is turned on.
+### Additional Information
+Ensure that all necessary Python packages and dependencies are installed.
+
+For further details and usage, refer to the in-app guidance and prompts.
