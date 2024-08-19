@@ -1,8 +1,8 @@
-# relative_keys
+# relative_keys_XUI
 
-This is a preliminary **relative keys** code repository for reference.
+This is an extension to the work by Shuai An on the Relative keys algorithm. https://github.com/shuaianuoe/relative_keys/tree/main 
 
-It mainly includes model training (1), testing the explanation and monitoring explanation of SRK (2.1), OSRK (2.2), and SSRK (2.3) algorithms. In addition, it also includes testing explanation performance under dynamic models (2.4) and serves as an indicator for monitoring ML performance (2.5).
+This work modifies and further adds to his work by making it suitable to an online and dynamic setting that is user interactable and simple. 
 
 
 Firstly, the following packages are necessary:
@@ -12,6 +12,8 @@ pandas 2.0.1
 scikit-learn 0.24.2
 xgboost 1.7.1
 redis 4.6.0
+flask 2.8.1
+
 ```
 
 We should configure a config file. The default file `config.yaml`is the revidivism dataset as an example. More datasets can refer to `data_process` folder.
